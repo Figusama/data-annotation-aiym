@@ -28,7 +28,7 @@ SCHEMA = pa.schema([
 ])
 
 #%%
-def flush(buffer : list[dir], out_dir : str) -> None:
+def flush(buffer : list[dict], out_dir : str) -> None:
     if not buffer:
         return
 
@@ -56,12 +56,12 @@ base_options = python.BaseOptions(
 options = vision.HandLandmarkerOptions(
     base_options = base_options,
     num_hands=2,
-    min_hand_detection_confidence=0.3,
-    min_tracking_confidence=0.3,
+    min_hand_detection_confidence=0.1,
+    min_tracking_confidence=0.1,
 )
 #%%
 os.makedirs(OUT_DIR, exist_ok=True)
-buffer: list[dir] = []
+buffer: list[dict] = []
 #%%
 with vision.HandLandmarker.create_from_options(options=options) as landmark:
 
@@ -98,8 +98,8 @@ with vision.HandLandmarker.create_from_options(options=options) as landmark:
                             hand_label = res.handedness[hand_idx][0].display_name
 
                             row = {
-                                "full_path":  full_path,
-                                "frame_idx":  frame_idx,
+                                "filename":  full_path,
+                                "frame":  frame_idx,
                                 "hand_label": hand_label,
                             }
                             for j, lm in enumerate(landmarks):
