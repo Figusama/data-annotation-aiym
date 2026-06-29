@@ -15,3 +15,8 @@ spreadthesign_hs has some handshapes from the spreadthesign website. Can be very
 texts - contains transcripts of surdobot video base.
 videos - contains the surdobot transcripts. 
 Inside test, the test folder contains frames with hand-points. Just for visualization.
+
+* Explanation of notebooks...
+
+frame_cr.py - the code that generated the elarna hand landmarks. Used OpenCV for frame by frame and DuckDB for gpu acceleration. Used flush method to generate every 50k hand-labels in instant for better memory usage.
+
