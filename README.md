@@ -20,3 +20,13 @@ Inside test, the test folder contains frames with hand-points. Just for visualiz
 
 frame_cr.py - the code that generated the elarna hand landmarks. Used OpenCV for frame by frame and DuckDB for gpu acceleration. Used flush method to generate every 50k hand-labels in instant for better memory usage.
 
+sr_transcript.ipynb - the notebook that generates transcripts of elarna files using whisper. Transcripts are timestamped on word level. To make it effective on gpu used batching method and faster-whisper.
+
+surdobot_matches.ipynb - the notebook helps match surdobot videos to existing transcripts, about 1/3 of the videos have transcripts from youtube.
+
+surdobot_preprocessing.ipynb - the notebook preprocesses surdobot files, like annotations of surdobot videos and its hand keypoints. Hand keypoints were grouped by video in surdobot_raw_hs_keypoints folder. Annotations were parsed and analyzed.
+
+mathcing.ipynb - the code for matching transcripts of elarna videos and transcirpts.
+
+audio_detection.ipynb - the code for detecting audio of elarna videos for analysis purposes. Where audio existence bool is saved in master_audio_exists.csv.
+
