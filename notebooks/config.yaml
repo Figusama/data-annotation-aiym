@@ -1,0 +1,90 @@
+# ─────────────────────────────────────────────
+#  SLR Pipeline · Phase 1 Configuration
+# ─────────────────────────────────────────────
+
+paths:
+  # ── Root data directory (adjust to your machine) ──
+  data_root: "/run/media/gygy/T7/KRSL_OnlineSchool/KRSL_OnlineSchool_final_dataset"
+
+  # ── Surdobot ──
+  surdobot_videos:       "${paths.data_root}/Surdobot_VideoBase"
+  surdobot_annotations:  "${paths.data_root}/Surdobot_Annotations"   # CSVs with gloss bag labels
+  hs_labeled:            "${paths.data_root}/hs_labeled"             # krsl_07_11_[0-500k]_dataset.csv etc.
+
+  # ── Elarna ──
+  elarna_videos:         "${paths.data_root}/video"
+  elarna_transcripts:    "${paths.data_root}/transcripts"
+
+  # ── Output directories (created automatically) ──
+  features_root:         "${paths.data_root}/features"
+  surdobot_features:     "${paths.data_root}/features/surdobot"
+  elarna_features:       "${paths.data_root}/features/elarna"
+  asr_cache:             "${paths.data_root}/features/asr_cache"      # Whisper outputs cached here
+  manifest_dir:          "${paths.data_root}/features/manifests"      # JSON manifests per split
+
+# ─────────────────────────────────────────────
+video:
+  fps: 25
+  clip_len_sec: 30          # Surdobot clips are ~30s; Elarna uses sliding window
+  img_size: 224             # VideoMAE input resolution
+  num_frames: 16            # frames sampled per clip for VideoMAE (uniform sampling)
+  channels: 3
+
+keypoints:
+  num_points: 21            # MediaPipe hand keypoints per hand
+  num_hands: 2              # left + right → 42 nodes total
+  coord_dims: 3             # x, y, z
+  include_velocity: true    # append (x_t - x_{t-1}) as extra feature channel
+  normalize: wrist_relative # subtract wrist keypoint (index 0) from all others
+
+asr:
+  model_size: "large-v3"    # whisper model: tiny/base/small/medium/large-v2/large-v3
+  language: "ru"            # primary language; switch to "kk" for Kazakh clips
+  word_timestamps: true
+  confidence_threshold: 0.60  # tokens below this are marked uncertain
+  device: "cuda"
+
+lag:
+  # DTW-based offline lag estimation (runs before neural training)
+  min_lag_sec: 0.5
+  max_lag_sec: 5.0
+  default_lag_sec: 2.0      # initialization value for learnable δ_v
+  dtw_window_ratio: 0.3     # Sakoe-Chiba band = 30% of signal length
+
+features:
+  # VideoMAE visual features
+  videomae_model: "MCG-NJU/videomae-base"   # HuggingFace model ID
+  videomae_dim: 768
+
+  # ST-GCN keypoint features
+  stgcn_hidden_dim: 256
+  stgcn_num_layers: 3
+
+  # Text / transcript features
+  text_model: "xlm-roberta-base"            # multilingual, handles ru + kk
+  text_dim: 768
+
+  # Fused feature dim (used by Phase 2+ models)
+  fused_dim: 1024
+
+dataloader:
+  batch_size: 8
+  num_workers: 4
+  pin_memory: true
+  prefetch_factor: 2
+  # Modality dropout probabilities during training (Phase 2)
+  modality_dropout:
+    video: 0.0          # never drop video — it's the primary modality
+    keypoints: 0.10
+    text: 0.15
+
+splits:
+  # Surdobot split ratios (no predefined splits exist)
+  train: 0.80
+  val:   0.10
+  test:  0.10
+  seed:  42
+
+logging:
+  level: "INFO"
+  log_file: "logs/phase1.log"
