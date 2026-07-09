@@ -1,0 +1,5 @@
+torch>=2.1
+transformers>=4.38
+decord>=0.6.0
+opencv-python-headless>=4.9
+numpy>=1.24
