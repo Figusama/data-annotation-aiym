@@ -195,15 +195,28 @@ def main():
         """Run one forward pass over a batch of pre-sampled frame stacks."""
         if not batch_frames:
             return
-        inputs = processor(list(batch_frames), return_tensors="pt")
+        # VideoMAEImageProcessor expects each video as a *list of individual
+        # frames* (List[List[frame]]), not a single stacked (T, H, W, 3)
+        # array per video -- unstack before handing off.
+        videos = [list(frames) for frames in batch_frames]
+        inputs = processor(videos, return_tensors="pt")
         pixel_values = inputs["pixel_values"].to(device)
         with torch.no_grad():
             out = model(pixel_values=pixel_values)
         hidden = out.last_hidden_state  # (B, seq_len, hidden_dim)
         for cid, h in zip(batch_clip_ids, hidden):
-            feat = h.mean(dim=0) if args.pooling == "mean" else h
-            np.save(args.out_dir / f"{cid}.npy", feat.cpu().numpy().astype(np.float32))
-            ok.append(cid)
+            # clip_id can contain '/' (e.g. "27_10/clip.mp4"), so make sure
+            # the destination subdirectory exists before writing.
+            out_path = args.out_dir / f"{cid}.npy"
+            try:
+                out_path.parent.mkdir(parents=True, exist_ok=True)
+                feat = h.mean(dim=0) if args.pooling == "mean" else h
+                np.save(out_path, feat.cpu().numpy().astype(np.float32))
+                ok.append(cid)
+            except Exception as e:
+                # isolate this clip's failure rather than letting it abort
+                # (and mis-attribute) the rest of the batch
+                failed.append({"clip_id": cid, "error": f"save failed: {e}"})
 
     batch_clip_ids, batch_frames = [], []
     total = len(records)
