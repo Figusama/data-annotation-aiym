@@ -1,0 +1,37 @@
+(sign-lang) nurobot427@nurobot427-Z690-Extreme:~/Desktop/data-annotation-aiym$ python train02.py \
+  --records ./notebooks/surdobot_dataset_records.json \
+  --video-feat-dir /media/nurobot427/T7/KRSL_OnlineSchool/Videomae_features_seq \
+  --keypoint-dir /media/nurobot427/T7/KRSL_OnlineSchool/surdobot_raw_hs_keypoints \
+  --vocab ./notebooks/surdobot_vocab.json \
+  --checkpoint-dir ./checkpoints \
+  --epochs 20 --batch-size 24 --lr 1e-4 --device cuda:1 \
+  --temp-resplit --val-fraction 0.1 \
+  --ctc-weight 0.2 --mil-weight 2.0
+Using device: cuda:1
+resplit_by_session: 4 sessions -> 3 train sessions (11533 clips), 1 val sessions (4537 clips)
+SurdobotFusionDataset.from_records: 11533 records
+SurdobotFusionDataset.from_records: 4537 records
+/home/nurobot427/miniconda3/envs/sign-lang/lib/python3.12/site-packages/torch/optim/lr_scheduler.py:62: UserWarning: The verbose parameter is deprecated. Please use get_last_lr() to access the learning rate.
+  warnings.warn(
+/home/nurobot427/Desktop/data-annotation-aiym/train02.py:298: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = torch.cuda.amp.GradScaler(enabled=(args.amp and device == "cuda"))
+[epoch   1/20] train_loss=1.977 train_WER=1.051 | val_loss=1.684 val_WER=1.000 | 844.6s
+  -> new best val_wer=1.000, saved best_wer.pt
+[epoch   2/20] train_loss=1.591 train_WER=1.000 | val_loss=1.656 val_WER=1.000 | 851.9s
+  -> No improvement in WER. Early stopping counter: 1/8
+[epoch   3/20] train_loss=1.584 train_WER=1.000 | val_loss=1.727 val_WER=1.000 | 852.0s
+  -> No improvement in WER. Early stopping counter: 2/8
+[epoch   4/20] train_loss=1.581 train_WER=1.000 | val_loss=1.632 val_WER=1.000 | 852.5s
+  -> No improvement in WER. Early stopping counter: 3/8
+[epoch   5/20] train_loss=1.579 train_WER=1.000 | val_loss=1.711 val_WER=1.000 | 851.8s
+  -> No improvement in WER. Early stopping counter: 4/8
+[epoch   6/20] train_loss=1.571 train_WER=1.000 | val_loss=1.664 val_WER=1.000 | 852.2s
+  -> No improvement in WER. Early stopping counter: 5/8
+[epoch   7/20] train_loss=1.570 train_WER=1.000 | val_loss=1.654 val_WER=1.000 | 849.1s
+  -> No improvement in WER. Early stopping counter: 6/8
+[epoch   8/20] train_loss=1.570 train_WER=1.000 | val_loss=1.669 val_WER=1.000 | 850.7s
+  -> No improvement in WER. Early stopping counter: 7/8
+[epoch   9/20] train_loss=1.570 train_WER=1.000 | val_loss=1.671 val_WER=1.000 | 852.5s
+  -> No improvement in WER. Early stopping counter: 8/8
+Early stopping triggered after 9 epochs due to no improvement in Validation WER.
+
